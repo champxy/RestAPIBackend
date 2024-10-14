@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const fs = require('fs');
 
  exports.read = async (req, res) => {
     try {
@@ -25,11 +26,13 @@ exports.list = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        console.log(req.body);
-        if (!req.body.name || !req.body.detail || !req.body.price) {
+        var data = req.body;
+        data.file = req.file.filename;
+        console.log(data);
+        if (!req.body.name || !req.body.detail || !req.body.price ) {
             return res.status(400).send('All fields are required');
         }else{
-            const producted = await Product.create(req.body);
+            const producted = await Product.create(data);
             res.send(producted);
         }
     }
@@ -55,6 +58,13 @@ exports.remove = async (req, res) => {
     try {
         const id = req.params.id;
         const remove = await Product.findByIdAndDelete(id).exec();
+        
+        if (remove?.file) {
+            await fs.unlink('./uploads/' + remove.file, function (err) {
+                if (err) throw err;
+                console.log('File deleted!');
+            });
+        }
         if (!remove) {
             return res.status(400).send('Product not found');
         }else{

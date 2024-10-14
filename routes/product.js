@@ -3,14 +3,14 @@ const router = express.Router();
 const { read , list , create , update, remove} = require('../controllers/product');
 //midleware
 const { auth } = require('../middleware/auth'); 
-
+const { upload } = require('../middleware/upload');
 
 //http://localhost:4900/api/product
 router.get('/product',auth, list);
 
 router.get('/product/:id',auth, read);
 
-router.post('/product',auth, create);
+router.post('/product',auth, upload ,  create);
 
 router.put('/product/:id',auth, update);
 
